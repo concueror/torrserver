@@ -13,7 +13,7 @@ RUN cd /tmp && git clone https://github.com/YouROK/TorrServer.git
 RUN cd $WORK && GOPATH=$WORK GOBIN=$GOBIN $GO get ./...
 RUN cd $WORK/src/github.com/anacrolix && git clone https://github.com/anacrolix/utp.git
 RUN cd $WORK && GOPATH=$WORK GOARM=7 GOOS=linux GOARCH=arm $GO build -o $OUT main && mv $OUT /
-RUN apt-get purge --auto-remove git golang-1.10.go && rm -rf /var/lib/apt/lists
+RUN apt-get purge --auto-remove git golang-1.10.go && rm -rf /var/lib/apt/lists $WORK
 
 EXPOSE 8090:8090
 CMD ["/TorrServer"]
