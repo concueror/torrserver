@@ -1,8 +1,14 @@
 version: "2"
 services:
   torrserver:
-    image: alexks02/armhf-torrserver-sid:latest
-    container_name: torrserver
+    image: alexks02/torrserver
+    container_name: torrserver-amd64
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.amd64
+  torrserver-armhf:
+    image: alexks02/torrserver:armhf
+    container_name: torrserver-armhf
+    build:
+      context: .
+      dockerfile: ./Dockerfile.armhf

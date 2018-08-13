@@ -10,7 +10,7 @@ The recommended way to run TorrServer is using Docker Compose using the followin
 version: '2'
 services:
   torrserver:
-    image: alexks02/armhf-torrserver
+    image: alexks02/torrserver:latest
     container_name: torrserver
     ports:
      - "8090:8090"
