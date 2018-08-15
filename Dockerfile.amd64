@@ -14,7 +14,7 @@ RUN	echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/s
 	cd $WORK/src/github.com/anacrolix && \
 	git clone https://github.com/anacrolix/utp.git && \
 	cd $WORK && \
-	GOPATH=$WORK GOOS=linux GOARCH=amd $GO build -o $OUT main && \
+	GOPATH=$WORK GOOS=linux GOARCH=amd64 $GO build -o $OUT main && \
 	mv $OUT / && \
 	apt-get purge --auto-remove -y git golang-1.10.go && \
 	rm -rf /var/lib/apt $WORK
