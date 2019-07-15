@@ -4,6 +4,7 @@ ENV GO /usr/lib/go-1.10/bin/go
 ENV WORK /tmp/TorrServer
 ENV GOBIN /usr/lib/go-1.10/bin
 ENV OUT dist/TorrServer
+ENV VERSION 1.1.71
 
 RUN	echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list && \
 	apt-get update && apt-get install -y git golang-1.10-go && \
