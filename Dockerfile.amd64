@@ -2,7 +2,7 @@ FROM alpine:latest
 
 ENV GO_VERSION 1.12.6
 ENV GO_BUNDLE go$GO_VERSION.linux-alpine-amd64.tar.gz
-ENV GO_URL http://resin-packages.s3.amazonaws.com/golang/v$GO_VERSION/$GO_ARCHIVE
+ENV GO_URL http://resin-packages.s3.amazonaws.com/golang/v$GO_VERSION/$GO_BUNDLE
 ENV GO_CRC cfe52b99a1b76b93da9d381027af47a62b8d0c6278cefd6186d1dd6fa450204b
 ENV WORK /tmp/TorrServer
 ENV GODIR /usr/local/go
