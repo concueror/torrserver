@@ -1,0 +1,8 @@
+version: '2'
+services:
+  torrserver:
+    image: alexks02/torrserver:amd64
+    container_name: torrserver
+    ports:
+     - "8090:8090"
+    restart: unless-stopped

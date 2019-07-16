@@ -1,24 +1,34 @@
-FROM debian:stretch
+FROM alpine:latest
 
-ENV GO /usr/lib/go-1.10/bin/go
+#COPY bin/ /usr/bin/
+#RUN [ "cross-build-start" ]
+
+ENV GO_VERSION 1.12.6
+ENV GO_ARCHIVE go$GO_VERSION.linux-alpine-amd64.tar.gz
+ENV GO_URL http://resin-packages.s3.amazonaws.com/golang/v$GO_VERSION/$GO_ARCHIVE
+ENV GO_CRC cfe52b99a1b76b93da9d381027af47a62b8d0c6278cefd6186d1dd6fa450204b
 ENV WORK /tmp/TorrServer
-ENV GOBIN /usr/lib/go-1.10/bin
-ENV OUT dist/TorrServer
-ENV VERSION 1.1.71
+ENV GODIR /usr/local/go
 
-RUN	echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list && \
-	apt-get update && apt-get install -y git golang-1.10-go && \
-	cd /tmp && \
-	git clone https://github.com/YouROK/TorrServer.git && \
-	cd $WORK && \
-	GOPATH=$WORK GOBIN=$GOBIN $GO get ./... && \
+RUN	apk add curl g++ git && \
+	echo "Installing Go..." && \
+	mkdir -p /usr/local/go && \
+	curl -SLO "$GO_URL" && \
+	echo "$GO_CRC  $GO_ARCHIVE" | sha256sum -c - && \
+	tar -xzf $GO_ARCHIVE -C /usr/local/go --strip-components=1 && \
+	rm -f $GO_ARCHIVE && \
+	ls -la /usr/local && ls -la /usr/local/go && ls -la /usr/local/go/bin && \
+	cd /tmp && git clone https://github.com/YouROK/TorrServer.git && \
+	echo "Getting all project dependencies..." && \
+	cd $WORK && GOPATH=$WORK GOBIN=$GODIR/bin $GODIR/bin/go get -fix ./... >/dev/null 2>&1 || : && \
+	mkdir -p $WORK/src/github.com/anacrolix && \
 	cd $WORK/src/github.com/anacrolix && \
 	git clone https://github.com/anacrolix/utp.git && \
-	cd $WORK && \
-	GOPATH=$WORK GOOS=linux GOARCH=amd64 $GO build -o $OUT main && \
-	mv $OUT / && \
-	apt-get purge --auto-remove -y git golang-1.10.go && \
-	rm -rf /var/lib/apt $WORK
+	echo "Compiling TorrServer..." && \
+	cd $WORK && GOPATH=$WORK GOOS=linux GOARCH=amd64 $GODIR/bin/go build -o dist/TorrServer main && mv dist/TorrServer / && \
+	rm -rf /var/cache/apk/* /usr/local/go /tmp /root/.cache/go-build && \
+	apk del curl g++ git && apk add libc-dev libstdc++
+RUN	du -ms /usr/*
 
 EXPOSE 8090:8090
 CMD ["/TorrServer"]
