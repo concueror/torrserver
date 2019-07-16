@@ -1,7 +1,7 @@
 version: '2'
 services:
   torrserver:
-    image: alexks02/torrserver:amd64
+    image: alexks02/torrserver:armhf
     container_name: torrserver
     ports:
      - "8090:8090"

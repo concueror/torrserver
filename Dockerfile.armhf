@@ -4,16 +4,19 @@ COPY bin/ /usr/bin/
 RUN [ "cross-build-start" ]
 
 ENV GO_VERSION 1.12.6
+ENV GO_BUNDLE go$GO_VERSION.linux-alpine-armv7hf.tar.gz
+ENV GO_URL http://resin-packages.s3.amazonaws.com/golang/v$GO_VERSION/$GO_ARCHIVE
+ENV GO_CRC 16d3bebb9bfbfde70c7777b06c074482870717332ec3d265ac06d24114990647
 ENV WORK /tmp/TorrServer
 ENV GODIR /usr/local/go
 
 RUN	apk add curl g++ git && \
 	echo "Installing Go..." && \
 	mkdir -p /usr/local/go && \
-	curl -SLO "http://resin-packages.s3.amazonaws.com/golang/v$GO_VERSION/go$GO_VERSION.linux-alpine-armv7hf.tar.gz" && \
-	echo "16d3bebb9bfbfde70c7777b06c074482870717332ec3d265ac06d24114990647  go$GO_VERSION.linux-alpine-armv7hf.tar.gz" | sha256sum -c - && \
-	tar -xzf "go$GO_VERSION.linux-alpine-armv7hf.tar.gz" -C /usr/local/go --strip-components=1 && \
-	rm -f go$GO_VERSION.linux-alpine-armv7hf.tar.gz && \
+	curl -SLO "$GO_URL" && \
+	echo "$GO_CRC  $GO_BUNDLE" | sha256sum -c - && \
+	tar -xzf $GO_BUNDLE -C /usr/local/go --strip-components=1 && \
+	rm -f $GO_BUNDLE && \
 	cd /tmp && git clone https://github.com/YouROK/TorrServer.git && \
 	echo "Getting all project dependencies..." && \
 	cd $WORK && GOPATH=$WORK GOBIN=$GODIR/bin $GODIR/bin/go get -fix ./... >/dev/null 2>&1 || : && \

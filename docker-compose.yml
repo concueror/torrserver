@@ -1,7 +1,7 @@
 version: "2"
 services:
   torrserver:
-    image: alexks02/torrserver
+    image: alexks02/torrserver:latest
     container_name: torrserver
     build:
       context: .
