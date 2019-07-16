@@ -1,26 +1,29 @@
-FROM arm32v7/debian:stable
+FROM arm32v7/alpine
 
 COPY bin/ /usr/bin/
 RUN [ "cross-build-start" ]
 
-ENV GO /usr/lib/go-1.10/bin/go
+ENV GO_VERSION 1.12.6
 ENV WORK /tmp/TorrServer
-ENV GOBIN /usr/lib/go-1.10/bin
-ENV OUT dist/TorrServer
+ENV GODIR /usr/local/go
 
-RUN	echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list && \
-	apt-get update && apt-get install -y git golang-1.10-go && \
-	cd /tmp && \
-	git clone https://github.com/YouROK/TorrServer.git && \
-	cd $WORK && \
-	GOPATH=$WORK GOBIN=$GOBIN $GO get ./... && \
+RUN	apk add curl g++ git && \
+	echo "Installing Go..." && \
+	mkdir -p /usr/local/go && \
+	curl -SLO "http://resin-packages.s3.amazonaws.com/golang/v$GO_VERSION/go$GO_VERSION.linux-alpine-armv7hf.tar.gz" && \
+	echo "16d3bebb9bfbfde70c7777b06c074482870717332ec3d265ac06d24114990647  go$GO_VERSION.linux-alpine-armv7hf.tar.gz" | sha256sum -c - && \
+	tar -xzf "go$GO_VERSION.linux-alpine-armv7hf.tar.gz" -C /usr/local/go --strip-components=1 && \
+	rm -f go$GO_VERSION.linux-alpine-armv7hf.tar.gz && \
+	cd /tmp && git clone https://github.com/YouROK/TorrServer.git && \
+	echo "Getting all project dependencies..." && \
+	cd $WORK && GOPATH=$WORK GOBIN=$GODIR/bin $GODIR/bin/go get -fix ./... >/dev/null 2>&1 || : && \
+	mkdir -p $WORK/src/github.com/anacrolix && \
 	cd $WORK/src/github.com/anacrolix && \
 	git clone https://github.com/anacrolix/utp.git && \
-	cd $WORK && \
-	GOPATH=$WORK GOARM=7 GOOS=linux GOARCH=arm $GO build -o $OUT main && \
-	mv $OUT / && \
-	apt-get purge --auto-remove -y git golang-1.10.go && \
-	rm -rf /var/lib/apt $WORK
+	echo "Compiling TorrServer..." && \
+	cd $WORK && GOPATH=$WORK GOARM=7 GOOS=linux GOARCH=arm $GODIR/bin/go build -o dist/TorrServer main && mv dist/TorrServer / && \
+	rm -rf /var/cache/apk/* /usr/local/go /tmp /root/.cache/go-build && \
+	apk del curl g++ git && apk add libc-dev libstdc++
 
 EXPOSE 8090:8090
 CMD ["/TorrServer"]
